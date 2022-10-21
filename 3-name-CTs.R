@@ -33,7 +33,9 @@ toronto_census_df <- within(toronto_census_df, ct_nhoods[name == '0038.00'] <- '
 # Reformat this one a litt
 toronto_census_df <- toronto_census_df %>%
   select(ct_nhoods, everything()) %>% 
-  rename(neighbourhoods_touching_this_census_tract = ct_nhoods)
+  rename(Census_Tract_neighbourhoods = ct_nhoods) %>%
+  select(name, everything()) %>% 
+  rename(CENSUS_TRACT_NAME = name)
 
 #map the results
 # make_leaflet(toronto_census_df, toronto_census_df$ct_nhoods)
@@ -51,4 +53,9 @@ kensingtonCensusData <- setDT(kensingtonCensusData, keep.rownames = TRUE)[]
 
 #Export Kensington data, and the large dataframe containing all Toronto Census Tracts (and a few outside Toronto)
 write_csv(kensingtonCensusData, './output/kensington21CensusData.csv')
+
+#last little cleanup
+toronto_census_df <- st_drop_geometry(toronto_census_df) %>% 
+  select(!c("Shape Area", "Quality Flags"))
+
 write_csv(toronto_census_df, './output/toronto21CensusTractData.csv')
