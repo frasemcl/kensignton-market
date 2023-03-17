@@ -55,4 +55,5 @@ rsconnect/
 
 # Custom
 rawData 
-output 
+output
+.DS_Store
