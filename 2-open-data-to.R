@@ -25,7 +25,9 @@ datastore_resources <- filter(resources, tolower(format) %in% c('csv', 'geojson'
 nhood_data <- filter(datastore_resources, row_number()==1) %>% get_resource()
 
 #test map them
-make_leaflet(nhood_data, label=data$AREA_NAME)
+mapNHs <- make_leaflet(nhood_data, label=nhood_data$AREA_NAME)
+
+
 
 
 

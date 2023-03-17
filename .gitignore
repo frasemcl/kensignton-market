@@ -55,5 +55,7 @@ rsconnect/
 
 # Custom
 rawData 
-output
+output/*
+!output/_.txt
 .DS_Store
+tests.R
