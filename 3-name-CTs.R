@@ -19,6 +19,28 @@ library(data.table)
 ct_centroids <- st_centroid(census_data) %>%
   select(name, geometry)
 
+# check these on the map and determine if any centroids won't fall in a neighbourhood
+# make_leaflet_3(df=census_data,
+#                label=census_data$name,
+#                group1='Census Tracts',
+#                df2=nhood_data,
+#                label2=nhood_data$AREA_NAME,
+#                group2='Neighbourhoods',
+#                df3=ct_centroids,
+#                group3='CT Centroids')
+
+# Visiual inspection of the map above shows the following fall outside any neighbourhood (in the water)
+# Correction points were established using google (just inland from the anomalies)
+new_point_0003.00 <- st_point(c(-79.453501, 43.638184)) %>% 
+  st_sfc(crs = 4283)
+new_point_0210.04 <- st_point(c(-79.477144, 43.626379)) %>%
+  st_sfc(crs = 4283)
+new_point_0200.01 <- st_point(c(-79.485422, 43.617952)) %>% 
+  st_sfc(crs = 4283)
+ct_centroids$geometry[ct_centroids$name=='0003.00']=new_point_0003.00
+ct_centroids$geometry[ct_centroids$name=='0210.04']=new_point_0210.04
+ct_centroids$geometry[ct_centroids$name=='0200.01']=new_point_0200.01
+
 # Return the intersection of these centroids and GTA neighbourhoods
 ct_centroids_named <- st_intersection(ct_centroids, nhood_data) %>% 
   select(name, AREA_NAME)
@@ -38,20 +60,8 @@ tor_census_df <- tor_census_df %>%
   select(name, AREA_NAME, name_concat, everything())
 
 
-# Fix or delete
-make_leaflet_3(df=nhood_data, df2=test2, group='test', group2='test2', label1 = nhood_data$AREA_NAME)
-
-
-
-
-
-
-
-
 # map the results then results and results from previous script
-make_leaflet(tor_census_df, tor_census_df$name_concat)
-
-# TODO clean up bug where sunnyside gets no nhood. Or is there just nothing there?
+# make_leaflet(tor_census_df, tor_census_df$name_concat)
 
 make_leaflet_2(df=tor_census_df, 
                label=tor_census_df$name_concat,
@@ -71,6 +81,7 @@ make_leaflet_3(df=tor_census_df,
 
 
 # The following is to export CSVs to KMCLT
+# Not required for upcoming data visualizations
 # SELECT kensington CT only, transpose it for legibility, rename the column
 # Flipped from wide to long
 kensingtonCensusData <- st_drop_geometry(tor_census_df %>% 

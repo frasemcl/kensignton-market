@@ -37,6 +37,6 @@ census_data <- get_census(
   )
 
 # map CTs (not needed, just a check):
-# map_CTs <- make_leaflet(census_data, label=census_data$name)
-# map_CTs
+make_leaflet(census_data, label=census_data$name)
+
 
