@@ -1,19 +1,23 @@
-# TODO dict of variable names. eg. v_CA21_572
-# Why the repetition? Answer: Total, male, female
 library(cancensus)
 library(plotly)
 library(tidyverse)
 library(vtable)
 library(leaflet)
+library(reactable)
 
 # WORK IN PROGRESS
 
 # This is a nice feature, TODO get the VAR details
 # Use this to look at what may be comparable in prev years
 census_vectors_21 <- list_census_vectors('CA21')
-
-# From the previous scripts:
-tor_census_df
+# Subset by the ones I chose to look at ('1.cancensus.R')
+census_var_lookup <- census_vectors_21 %>% 
+  filter(vector %in% VECTOR_IDS) %>%
+  select(-parent_vector, -aggregation) %>% 
+  rename(census_variable = vector)
+# Make a searchable reactable:
+table_var_lookup<- reactable(census_var_lookup, searchable = TRUE, minRows = 10)
+table_var_lookup
 
 # Shorten colnames (will build a lookup table with better info on each code)
 colnames(tor_census_df) <- c(str_split(colnames(tor_census_df), ":") %>% map_chr(`[`, 1))
@@ -39,16 +43,29 @@ st(tor_census_df)
 ##### Leaflet choropleth
 
 
+#### Try plotly choropleth?
 
-# Try plotly choropleth?
+
+#### Ranked Bar graph. Sortable? Paginated?
+# Or just vars I'm most interested in? Accept that Shiny is way better for responsive...
+# TODO Make it a function where I pass in the var of interest
+
+plot_df <- tor_census_df %>%  
+  select(name_concat, v_CA21_4317) %>% 
+  arrange(desc(v_CA21_4317))
+
+plot_df$name_concat <- factor(plot_df$name_concat, levels = unique(plot_df$name_concat)[order(plot_df$v_CA21_4317)])
+
+
+plot <- plot_ly(plot_df,x = ~v_CA21_4317, y = ~name_concat, type = 'bar', orientation = 'h')
+
+plot
 
 
 
 # Helpful for ideas: https://walker-data.com/census-r/exploring-us-census-data-with-visualization.html
 # For eg. dot and whisker cleaner than boxplots? 
 # population pyramids? 
-
-
 
 
 
