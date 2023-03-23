@@ -13,7 +13,7 @@ census_vectors_21 <- list_census_vectors('CA21')
 # Subset by the ones I chose to look at ('1.cancensus.R')
 census_var_lookup <- census_vectors_21 %>% 
   filter(vector %in% VECTOR_IDS) %>%
-  select(-parent_vector, -aggregation) %>% 
+  # select(-parent_vector, -aggregation) %>% 
   rename(census_variable = vector)
 # Make a searchable reactable:
 table_var_lookup<- reactable(census_var_lookup, searchable = TRUE, minRows = 10)
@@ -24,7 +24,11 @@ colnames(tor_census_df) <- c(str_split(colnames(tor_census_df), ":") %>% map_chr
 
 
 # TODO How to fill NAs more appropirately? For now using -999
+# TODO explain that tor_census_df is
 # tor_census_df <- drop_na(tor_census_df)
+# Doing it two ways for now
+tor_census_df_na_zero <- tor_census_df
+tor_census_df_na_zero[is.na(tor_census_df_na_zero)] <- 0
 tor_census_df[is.na(tor_census_df)] <- -999
 # Subsetting while testing
 # tor_census_df <- tor_census_df[1:10,]
@@ -32,35 +36,127 @@ tor_census_df[is.na(tor_census_df)] <- -999
 
 
 
-# How to summarize?
-summary_tor_census_df <- summary(tor_census_df)
-# A quick sumtable() is a nice look:
-# https://cran.r-project.org/web/packages/vtable/vignettes/sumtable.html
-# Hmm this worked the first time....
-st(tor_census_df)
-
-
 ##### Leaflet choropleth
 
 
-#### Try plotly choropleth?
 
-
-#### Ranked Bar graph. Sortable? Paginated?
+#### Ranked Bar graph. Sortable? Paginated? ########## DELETE THIS SECTION AFTER PULLING ANYTHING USEFUL
 # Or just vars I'm most interested in? Accept that Shiny is way better for responsive...
 # TODO Make it a function where I pass in the var of interest
 
 plot_df <- tor_census_df %>%  
-  select(name_concat, v_CA21_4317) %>% 
+  select(name_concat, AREA_NAME, v_CA21_4317) %>% 
   arrange(desc(v_CA21_4317))
 
+
+# Appendix or delete. Here are two ways to arrange:
 plot_df$name_concat <- factor(plot_df$name_concat, levels = unique(plot_df$name_concat)[order(plot_df$v_CA21_4317)])
-
-
 plot <- plot_ly(plot_df,x = ~v_CA21_4317, y = ~name_concat, type = 'bar', orientation = 'h')
-
 plot
+# Same thing a different way, if works I could add dropdown to select var! Maybe, but might be same problem as before...
+test <-plot_ly(
+  data = plot_df,
+  y = ~name_concat,
+  x = ~v_CA21_4317,
+  type = "bar",
+  orientation='h'
+) %>% 
+  layout(yaxis = list(categoryorder = "total ascending"))
+test
 
+
+
+################## Make prev known as'coolOne' into a function
+
+# FUNCTION FOR PLOTLY 1####################
+make_plotly_sortedbar_filter <- function(df, axisStr, varVect, varStr) {
+  # TODO make matching reactable function using just this first part (but maybe pass in more vars?)
+  # TODO could this be cleaner (eg. one less input) using the column name from cols obj instead?
+  input_df <- df %>%  
+    select(name_concat, AREA_NAME, varStr) 
+  # %>% 
+  #   arrange(desc(varVect))
+  input_df$name_concat <- factor(input_df$name_concat, levels = unique(input_df$name_concat)[order(varVect)])
+
+  temp_df <- spread(input_df, key = AREA_NAME, value = colnames(input_df)[3])
+  temp_df[is.na(temp_df)] <- 0
+  cols <- colnames(temp_df)
+  fig <- plot_ly(temp_df, y = ~name_concat, x = as.numeric(unlist(temp_df[,cols[3]])), type = 'bar', name = cols[3],
+                      orientation='h')
+  i <- 2
+  while ( i <= length(cols)){
+    fig <- fig %>% add_trace(x = as.numeric(unlist(temp_df[,cols[i]])), name = cols[i])
+    i <- i + 1
+  }
+  fig <- fig %>% layout(xaxis = list(title = axisStr), 
+                                 yaxis = list(title = '')
+  )
+
+}
+
+############################ USING THIS FUNCTION
+# Graph 1 of this type
+avg_montly_rent_plotly <- make_plotly_sortedbar_filter(df = tor_census_df,
+                             axisStr = 'v_CA21_4317: Average Monthly Rent ($CAD)',
+                             varVect = tor_census_df$v_CA21_4317,
+                             varStr = 'v_CA21_4317'
+                             )
+avg_montly_rent_plotly
+# Graph 2
+# TODO what the difference between 4290 and 4294?
+high_shelter_costs_plotly <- make_plotly_sortedbar_filter(
+  df = tor_census_df,
+  axisStr = "v_CA21_4294: Number of households spending 30% or more of income on shelter costs",
+  varVect = tor_census_df$v_CA21_4294,
+  varStr = 'v_CA21_4294'
+)
+high_shelter_costs_plotly 
+#####################################################
+
+# TODO make a function for the version without filtering? As a more responsive quick look?
+# TODO add a mean and median line for this next graph
+
+# FUNCTION FOR PLOTLY 2 ####################
+make_plotly_sortedbar <- function(df, axisStr, varVect, varStr) {
+  input_df <- df %>%
+    select(name_concat, varStr)
+  cols <- colnames(input_df)
+  input_df$name_concat <- factor(input_df$name_concat, levels = unique(input_df$name_concat)[order(varVect)])
+  fig <- plot_ly(input_df, x = ~name_concat, y = as.numeric(unlist((input_df[,cols[2]])), type = 'bar'
+                                                            , orientation='h'
+                                                            ))
+
+  fig <- fig %>% layout(
+    yaxis = list(title = axisStr),
+    xaxis = list(
+      rangeslider = list(),
+      title = '')
+  )
+
+}
+############################ USING THIS FUNCTION
+iLikeIt <- make_plotly_sortedbar(df = tor_census_df_na_zero,
+                              axisStr = "Num households spending 30% or more of income on shelter",
+                              varVect = tor_census_df_na_zero$v_CA21_4294,
+                              varStr = 'v_CA21_4294')
+
+iLikeIt
+
+
+
+# TODO forget NHs, but can I make a var selector dropdown on this same plot? Like the histogram?
+
+
+
+
+
+
+# 3? versions of this plotly ... Working test above
+# 1) Legend grouped by neighbourhood, filter by multiple vars, no sort, no axis lab
+# I think this means making df wide instead of long first, so all vars would be huge. Set instead?
+
+# 2) Legend grouped by neighbourhood, one var, sorted, nice axis
+# 3) Legend neighbourhood, set of vars, sorted, nice axis
 
 
 # Helpful for ideas: https://walker-data.com/census-r/exploring-us-census-data-with-visualization.html
@@ -128,11 +224,14 @@ fig <- plot_ly(x = tor_census_df[, var_names[1]], type = "histogram",
   )
 fig
 
+# make this a function, and pair it in the markdown doc with the lookup table
 
 
 
 
-#################### Keeper #######
+
+#################### Keeper 1#######
+# TODO make it a function
 # Markers in plotly
 # https://plotly-r.com/working-with-symbols.html
 
@@ -163,8 +262,14 @@ fig2
 ################################################
 
 
-############# Archive 
+############# Archive, to delete after a read thru
 
+# How to summarize?
+summary_tor_census_df <- summary(tor_census_df)
+# A quick sumtable() is a nice look:
+# https://cran.r-project.org/web/packages/vtable/vignettes/sumtable.html
+# Hmm this worked the first time....
+st(tor_census_df)
 
 
 # Helpful but I'm not quite there yet (combining the two histograms...)
