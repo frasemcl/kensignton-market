@@ -7,6 +7,11 @@ library(reactable)
 
 # WORK IN PROGRESS
 
+# Info on interpretation:
+# https://www12.statcan.gc.ca/census-recensement/2021/ref/98-26-0006/982600062021001-eng.cfm
+# Anything useful?
+# https://open.canada.ca/data/en/dataset/85ca6dcc-c694-441e-afff-9ea7eeb265d8
+
 # This is a nice feature, TODO get the VAR details
 # Use this to look at what may be comparable in prev years
 census_vectors_21 <- list_census_vectors('CA21')
@@ -18,6 +23,22 @@ census_var_lookup <- census_vectors_21 %>%
 # Make a searchable reactable:
 table_var_lookup<- reactable(census_var_lookup, searchable = TRUE, minRows = 10)
 table_var_lookup
+table_var_lookup_all<- reactable(census_vectors_21, searchable = TRUE, minRows = 10)
+table_var_lookup_all
+# Searching 'shelter' in this one is interesting (and confusing)
+# TODO my understanding is that to get % of housholds with high shelter costs,
+# I need to calculate it based on v_CA21_4288 and v_CA21_4290, right?
+# Nevermind, v_CA21_4307 gives me that...wait just for owner...not all...
+
+# v_CA21_4288 Total - Owner and tenant households with household total income greater than zero, in non-farm, non-reserve private dwellings by shelter-cost-to-income ratio
+# v_CA21_4290 (households) Spending 30% or more of income on shelter costs
+# v_CA21_4302 Total - Owner and tenant households with household total income greater than zero and shelter-cost-to-income ratio less than 100%, in non-farm, non-reserve private dwellings
+# v_CA21_4307 % of owner households spending 30% or more of its income on shelter costs
+# v_CA21_4309 Median monthly shelter costs for owned dwellings ($)
+# v_CA21_4310 Average monthly shelter costs for owned dwellings ($)
+# v_CA21_4315 % of tenant households spending 30% or more of its income on shelter costs
+# v_CA21_4317 Median monthly shelter costs for rented dwellings ($)
+# v_CA21_4318 Average monthly shelter costs for rented dwellings ($)
 
 # Shorten colnames (will build a lookup table with better info on each code)
 colnames(tor_census_df) <- c(str_split(colnames(tor_census_df), ":") %>% map_chr(`[`, 1))
@@ -27,16 +48,69 @@ colnames(tor_census_df) <- c(str_split(colnames(tor_census_df), ":") %>% map_chr
 # TODO explain that tor_census_df is
 # tor_census_df <- drop_na(tor_census_df)
 # Doing it two ways for now
+tor_census_df_backup <- tor_census_df
 tor_census_df_na_zero <- tor_census_df
 tor_census_df_na_zero[is.na(tor_census_df_na_zero)] <- 0
+# NA as -999 on the main df
 tor_census_df[is.na(tor_census_df)] <- -999
 # Subsetting while testing
 # tor_census_df <- tor_census_df[1:10,]
 
 
+# Lookup table for select vars
+# The first three vars used for now as an example, but in the output I'll choose carefully and define each above/below
+tor_census_df_sel <- tor_census_df %>% 
+  select(name_concat, v_CA21_1, v_CA21_2, v_CA21_3)
+
+# Use the drop geom version here
+table_census_df_lookup1<- reactable(tor_census_df_sel, searchable = TRUE, minRows = 10)
+table_census_df_lookup1
 
 
 ##### Leaflet choropleth
+
+#Filter the df by the var of interest
+df <- tor_census_df_backup %>% 
+  select(name_concat, v_CA21_1)
+
+df2 <- nhood_data
+
+# remove NAs
+# Trying first with the NAs as a test
+# pal <- colorQuantile(palette = "YlOrRd", domain = df[[2]], n = 5, reverse = FALSE)
+pal <- colorNumeric(palette = "YlOrRd", domain = df[[2]], n = 5, reverse = FALSE)
+
+
+
+leaflet() %>% 
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(data=df2, 
+              fillOpacity = 0, 
+              color = 'grey', 
+              weight = 0.5, 
+              smoothFactor = 0.5, 
+              popup = ~df2$AREA_NAME, 
+              label = ~df2$AREA_NAME,
+              group = 'Neighbourhoods'
+  ) %>% 
+  addPolygons(data=df, 
+              fillColor = ~pal(df[[2]]),
+              fillOpacity = 0.8, 
+              color = 'grey', 
+              weight = 0.5, 
+              smoothFactor = 0.5, 
+              popup = ~df[[1]], 
+              label = ~df[[1]],
+              group = 'Census Tracts'
+  ) %>% 
+  addLayersControl(
+    overlayGroups = c('Census Tracts', 'Neighbourhoods'),
+  ) %>% 
+  addLegend(pal = pal, values = df[[2]], opacity = 0.7, title = names(df)[2],
+                position = "bottomleft")
+
+
+
 
 
 
@@ -103,14 +177,13 @@ avg_montly_rent_plotly <- make_plotly_sortedbar_filter(df = tor_census_df,
                              )
 avg_montly_rent_plotly
 # Graph 2
-# TODO what the difference between 4290 and 4294?
-high_shelter_costs_plotly <- make_plotly_sortedbar_filter(
+v_CA21_4290_plotly <- make_plotly_sortedbar_filter(
   df = tor_census_df,
-  axisStr = "v_CA21_4294: Number of households spending 30% or more of income on shelter costs",
-  varVect = tor_census_df$v_CA21_4294,
-  varStr = 'v_CA21_4294'
+  axisStr = "Households spending 30% or more of income on shelter costs",
+  varVect = tor_census_df$v_CA21_4290,
+  varStr = 'v_CA21_4290'
 )
-high_shelter_costs_plotly 
+v_CA21_4290_plotly 
 #####################################################
 
 # TODO make a function for the version without filtering? As a more responsive quick look?
@@ -126,8 +199,19 @@ make_plotly_sortedbar <- function(df, axisStr, varVect, varStr) {
                                                             , orientation='h'
                                                             ))
 
+  
+  m <- list(
+    l = 10,
+    r = 10,
+    b = 50,
+    t = 50,
+    pad = 20
+  )
+  
   fig <- fig %>% layout(
-    yaxis = list(title = axisStr),
+    title = axisStr,
+    margin = m,
+    # yaxis = list(title = axisStr),
     xaxis = list(
       rangeslider = list(),
       title = '')
@@ -135,16 +219,57 @@ make_plotly_sortedbar <- function(df, axisStr, varVect, varStr) {
 
 }
 ############################ USING THIS FUNCTION
-iLikeIt <- make_plotly_sortedbar(df = tor_census_df_na_zero,
-                              axisStr = "Num households spending 30% or more of income on shelter",
-                              varVect = tor_census_df_na_zero$v_CA21_4294,
-                              varStr = 'v_CA21_4294')
+# v_CA21_4307 % of owner households spending 30% or more of its income on shelter costs
+# v_CA21_4309 Median monthly shelter costs for owned dwellings ($)
+# v_CA21_4310 Average monthly shelter costs for owned dwellings ($)
+# v_CA21_4315 % of tenant households spending 30% or more of its income on shelter costs
+# v_CA21_4317 Median monthly shelter costs for rented dwellings ($)
+# v_CA21_4318 Average monthly shelter costs for rented dwellings ($)
+###
+v_CA21_4290_plotly_sorted_bar <- make_plotly_sortedbar(df = tor_census_df_na_zero,
+                              axisStr = "Households spending 30% or more of income on shelter costs",
+                              varVect = tor_census_df_na_zero$v_CA21_4290,
+                              varStr = 'v_CA21_4290')
 
-iLikeIt
+v_CA21_4290_plotly_sorted_bar
+###
+v_CA21_4310_plotly_sorted_bar <- make_plotly_sortedbar(df = tor_census_df_na_zero,
+                                                       axisStr = "Average monthly shelter costs for owned dwellings ($)",
+                                                       varVect = tor_census_df_na_zero$v_CA21_4310,
+                                                       varStr = 'v_CA21_4310')
 
+v_CA21_4310_plotly_sorted_bar
+###
+v_CA21_4310_plotly_sorted_bar <- make_plotly_sortedbar(df = tor_census_df_na_zero,
+                                                       axisStr = "Average monthly shelter costs for owned dwellings ($)",
+                                                       varVect = tor_census_df_na_zero$v_CA21_4310,
+                                                       varStr = 'v_CA21_4310')
 
+v_CA21_4310_plotly_sorted_bar
+###
+v_CA21_4307_plotly_sorted_bar <- make_plotly_sortedbar(df = tor_census_df_na_zero,
+                                                       axisStr = "% of owner households spending 30% or more of its income on shelter costs",
+                                                       varVect = tor_census_df_na_zero$v_CA21_4307,
+                                                       varStr = 'v_CA21_4307')
 
-# TODO forget NHs, but can I make a var selector dropdown on this same plot? Like the histogram?
+v_CA21_4307_plotly_sorted_bar
+###
+v_CA21_4318_plotly_sorted_bar <- make_plotly_sortedbar(df = tor_census_df_na_zero,
+                                                       axisStr = "Average monthly shelter costs for rented dwellings ($)",
+                                                       varVect = tor_census_df_na_zero$v_CA21_4318,
+                                                       varStr = 'v_CA21_4318')
+
+v_CA21_4310_plotly_sorted_bar
+###
+v_CA21_4315_plotly_sorted_bar <- make_plotly_sortedbar(df = tor_census_df_na_zero,
+                                                       axisStr = "% of tenant households spending 30% or more of its income on shelter costs",
+                                                       varVect = tor_census_df_na_zero$v_CA21_4315,
+                                                       varStr = 'v_CA21_4315')
+
+v_CA21_4315_plotly_sorted_bar
+###
+
+# TODO make a reactable with all these vars, and a few others (population, income etc). Make it searchable
 
 
 

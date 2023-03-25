@@ -96,10 +96,10 @@ kensingtonCensusData <- setDT(kensingtonCensusData, keep.rownames = TRUE)[]
 write_csv(kensingtonCensusData, './output/kensington21CensusData.csv')
 
 #last little cleanup
-tor_census_df <- st_drop_geometry(tor_census_df) %>% 
+tor_census_df_no_geom <- st_drop_geometry(tor_census_df) %>% 
   select(!c("Shape Area", "Quality Flags"))
 
-write_csv(tor_census_df, './output/toronto21CensusTractData.csv')
+write_csv(tor_census_df_no_geom, './output/toronto21CensusTractData.csv')
 
 
 
