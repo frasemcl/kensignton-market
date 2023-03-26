@@ -78,7 +78,7 @@ df2 <- tor_census_df_backup %>%
   drop_na()
 
 
-make_leaflet_compare2(df=df,
+map_leaflet_perc30 <- make_leaflet_compare2(df=df,
                       varDesc='v_CA21_4307 % of owner households spending 30% or more of its income on shelter costs',
                       df2=df2,
                       varDesc2 = 'v_CA21_4315 % of tenant households spending 30% or more of its income on shelter costs',

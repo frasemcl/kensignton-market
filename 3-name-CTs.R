@@ -70,7 +70,7 @@ make_leaflet_2(df=tor_census_df,
                label2=nhood_data$AREA_NAME,
                group2='Neighbourhoods')
 
-make_leaflet_3(df=tor_census_df, 
+map_naming_cts <- make_leaflet_3(df=tor_census_df, 
                 label=tor_census_df$name_concat,
                 group1='Census Tracts',
                 df2=nhood_data, 

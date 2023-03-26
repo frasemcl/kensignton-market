@@ -1,0 +1,99 @@
+---
+title: "Toronto Census 2021 Housing Data Summary"
+author: "Fraser McLaughlin"
+contact: 'fraser.mclaughlin@outlook.com'
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_notebook:
+    toc: yes
+    df_print: paged
+    toc_float: yes
+    number_sections: yes
+    code_folding: hide
+    
+---
+
+```{css, echo=FALSE}
+img {
+  width: 100%;
+  display: block;
+  margin: 30px auto;
+}
+
+p.caption {
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+.customTable {
+  width: 100%;
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+.customTable th,
+.customTable td {
+  width: 20%;
+  text-align: left;
+  padding: 4px;
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+```
+
+```{r setup, warning=FALSE, echo=FALSE}
+library("pacman")
+pacman::p_load(
+  tidyverse,
+  scales,
+  leaflet,
+  plotly,
+  reactable,
+  htmltools,
+  htmlwidgets,
+  leaflet.extras
+)
+
+```
+
+
+# Introduction
+
+Created: Feb 2023
+
+This analysis investigates...
+
+Data preparation:
+
+1) Write it up baby
+
+
+# Data prep
+
+## fig - Analysis Area
+
+```{r, fig.width=10,echo=FALSE}
+map_naming_cts
+```
+
+
+# Maps
+## fig - Name this map
+Any aditional text
+```{r,fig.width=10, echo=FALSE}
+map_leaflet_perc30
+```
+
+## fig - Name this graph
+Double click the ....TODO 
+```{r, fig.width=10, echo=FALSE}
+avg_montly_rent_plotly
+```
+
+## tbl - Table to lookup all the census variables...
+Use the search bar to...
+```{r, echo=FALSE}
+table_var_lookup_all
+```
+
+
