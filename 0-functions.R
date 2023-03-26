@@ -15,8 +15,7 @@ make_leaflet <- function(df, label = df[[1]]){
 }
 
 
-# If using with Shiny, follow option 2 in this answer:
-# https://gis.stackexchange.com/questions/283658/add-layers-with-leaflet-from-different-spatial-data-frames-in-r
+###
 make_leaflet_2 <- function(df,
                            label = df[[1]],
                            group1='layer_1',
@@ -44,6 +43,7 @@ make_leaflet_2 <- function(df,
     )
 }
 
+###
 make_leaflet_3 <- function(df,
                            label = df[[1]],
                            group1='layer_1',
@@ -76,6 +76,69 @@ make_leaflet_3 <- function(df,
       overlayGroups = c(group1, group2, group3),
     )
 }
+
+###
+make_leaflet_compare2 <- function(df,
+                                          label = df[[1]],
+                                          varDesc=names(df)[2],
+                                          df2,
+                                          label2 = df2[[1]],
+                                          varDesc2=names(df)[2],
+                                          df_nh = nhood_data,
+                                          perc_or_num='num'){
+  if (perc_or_num == 'num'){
+    pal <- colorNumeric(palette = "YlOrRd", domain = df[[2]], n = 5, reverse = FALSE)
+  pal2 <- colorNumeric(palette = "YlOrRd", domain = df2[[2]], n = 5, reverse = FALSE)
+  }
+  if (perc_or_num == 'perc'){
+  pal <- colorQuantile(palette = "YlOrRd", domain = df[[2]], n = 5, reverse = FALSE)
+  pal2 <- colorQuantile(palette = "YlOrRd", domain = df2[[2]], n = 5, reverse = FALSE)
+ }
+
   
+  
+  
+  leaflet() %>%
+    addSearchOSM() %>% 
+    addProviderTiles("CartoDB.Positron") %>%
+    addPolygons(data=df_nh, 
+                fillOpacity = 0, 
+                color = 'grey', 
+                weight = 0.5, 
+                smoothFactor = 0.5, 
+                popup = ~df_nh$AREA_NAME, 
+                label = ~df_nh$AREA_NAME,
+                group = 'Neighbourhoods'
+    ) %>% 
+    addPolygons(data=df, 
+                fillColor = ~pal(df[[2]]),
+                fillOpacity = 0.8, 
+                color = 'grey', 
+                weight = 0.5, 
+                smoothFactor = 0.5, 
+                popup = ~df[[1]], 
+                label = ~df[[1]],
+                group = varDesc
+    ) %>%
+    addPolygons(data=df2, 
+                fillColor = ~pal2(df2[[2]]),
+                fillOpacity = 0.8, 
+                color = 'grey', 
+                weight = 0.5, 
+                smoothFactor = 0.5, 
+                popup = ~df2[[1]], 
+                label = ~df2[[1]],
+                group = varDesc2
+    ) %>% 
+    addLayersControl(
+      overlayGroups = c(varDesc, varDesc2,'Neighbourhoods'),
+    ) %>% 
+    addLegend(pal = pal, values = df[[2]], opacity = 0.7, title = names(df)[2],
+              position = "bottomleft", group = varDesc) %>%
+    addLegend(pal = pal2, values = df2[[2]], opacity = 0.7, title = names(df2)[2],
+              position = "bottomleft", group = varDesc2) %>% 
+    hideGroup(varDesc2)
+}
+
   
   

@@ -4,8 +4,7 @@ library(tidyverse)
 library(vtable)
 library(leaflet)
 library(reactable)
-
-# WORK IN PROGRESS
+library(leaflet.extras)
 
 # Info on interpretation:
 # https://www12.statcan.gc.ca/census-recensement/2021/ref/98-26-0006/982600062021001-eng.cfm
@@ -69,45 +68,25 @@ table_census_df_lookup1
 
 ##### Leaflet choropleth
 
-#Filter the df by the var of interest
+#Filter the df by the var of interest. Function takes two dataframes
+# vars of interst to be filtered selected like this first
 df <- tor_census_df_backup %>% 
-  select(name_concat, v_CA21_1)
-
-df2 <- nhood_data
-
-# remove NAs
-# Trying first with the NAs as a test
-# pal <- colorQuantile(palette = "YlOrRd", domain = df[[2]], n = 5, reverse = FALSE)
-pal <- colorNumeric(palette = "YlOrRd", domain = df[[2]], n = 5, reverse = FALSE)
+  select(name_concat, v_CA21_4307) %>% 
+  drop_na()
+df2 <- tor_census_df_backup %>% 
+  select(name_concat, v_CA21_4315) %>% 
+  drop_na()
 
 
+make_leaflet_compare2(df=df,
+                      varDesc='v_CA21_4307 % of owner households spending 30% or more of its income on shelter costs',
+                      df2=df2,
+                      varDesc2 = 'v_CA21_4315 % of tenant households spending 30% or more of its income on shelter costs',
+                      perc_or_num = 'perc')
 
-leaflet() %>% 
-  addProviderTiles("CartoDB.Positron") %>%
-  addPolygons(data=df2, 
-              fillOpacity = 0, 
-              color = 'grey', 
-              weight = 0.5, 
-              smoothFactor = 0.5, 
-              popup = ~df2$AREA_NAME, 
-              label = ~df2$AREA_NAME,
-              group = 'Neighbourhoods'
-  ) %>% 
-  addPolygons(data=df, 
-              fillColor = ~pal(df[[2]]),
-              fillOpacity = 0.8, 
-              color = 'grey', 
-              weight = 0.5, 
-              smoothFactor = 0.5, 
-              popup = ~df[[1]], 
-              label = ~df[[1]],
-              group = 'Census Tracts'
-  ) %>% 
-  addLayersControl(
-    overlayGroups = c('Census Tracts', 'Neighbourhoods'),
-  ) %>% 
-  addLegend(pal = pal, values = df[[2]], opacity = 0.7, title = names(df)[2],
-                position = "bottomleft")
+
+
+
 
 
 
