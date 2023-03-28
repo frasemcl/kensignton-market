@@ -10,7 +10,8 @@
 
 
 #Run this command to render the html from the Rmd file.
-rmarkdown::render("./output/5-report.Rmd")
+rmarkdown::render("5-report.Rmd")
+
 
 
 

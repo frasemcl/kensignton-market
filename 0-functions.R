@@ -14,7 +14,6 @@ make_leaflet <- function(df, label = df[[1]]){
                 ) 
 }
 
-
 ###
 make_leaflet_2 <- function(df,
                            label = df[[1]],
@@ -78,6 +77,7 @@ make_leaflet_3 <- function(df,
 }
 
 ###
+# TODO add some details to the popup
 make_leaflet_compare2 <- function(df,
                                           label = df[[1]],
                                           varDesc=names(df)[2],
@@ -97,8 +97,9 @@ make_leaflet_compare2 <- function(df,
 
   
   
-  
-  leaflet() %>%
+  # Setting width here helps with mobile html formatting (from RMD knit)
+  # Makes it look worse within RStudio however
+  leaflet(width = "100%") %>%
     addSearchOSM() %>% 
     addProviderTiles("CartoDB.Positron") %>%
     addPolygons(data=df_nh, 
@@ -140,5 +141,32 @@ make_leaflet_compare2 <- function(df,
     hideGroup(varDesc2)
 }
 
+####### FUNCTION FOR INTEREACTIVE SLIDER PLOTLY ####################
+make_plotly_sortedbar <- function(df, axisStr, varVect, varStr) {
+  input_df <- df %>%
+    select(name_concat, varStr)
+  cols <- colnames(input_df)
+  input_df$name_concat <- factor(input_df$name_concat, levels = unique(input_df$name_concat)[order(varVect)])
+  fig <- plot_ly(input_df, x = ~name_concat, y = as.numeric(unlist((input_df[,cols[2]])), type = 'bar'
+                                                            , orientation='h'
+  ))
   
+  # m <- list(
+  #   l = 10,
+  #   r = 10,
+  #   b = 50,
+  #   t = 50,
+  #   pad = 20
+  # )
+  
+  fig <- fig %>% layout(
+    title = axisStr,
+    # margin = m,
+    # yaxis = list(title = axisStr),
+    xaxis = list(
+      rangeslider = list(),
+      title = '')
+  )
+}
+##############################################################################
   

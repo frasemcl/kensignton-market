@@ -1,5 +1,6 @@
 ---
-title: "Toronto Census 2021 Housing Data Summary"
+title: "Housing Affordability in Toronto"
+subtitle: "Visualizing 2021 Census Data"
 author: "Fraser McLaughlin"
 contact: 'fraser.mclaughlin@outlook.com'
 date: "`r format(Sys.time(), '%d %B, %Y')`"
@@ -12,25 +13,22 @@ output:
     code_folding: hide
     
 ---
-
 ```{css, echo=FALSE}
-img {
-  width: 100%;
-  display: block;
-  margin: 30px auto;
-}
 
 p.caption {
   font-size: 0.8em;
   font-weight: bold;
 }
 
+<!-- h2 { -->
+<!--   font-size: 2em; -->
+<!-- } -->
+
 .customTable {
   width: 100%;
   border: 1px solid black;
   border-collapse: collapse;
-}
-
+  
 .customTable th,
 .customTable td {
   width: 20%;
@@ -38,6 +36,7 @@ p.caption {
   padding: 4px;
   border: 1px solid black;
   border-collapse: collapse;
+}
 }
 ```
 
@@ -63,37 +62,63 @@ Created: Feb 2023
 
 This analysis investigates...
 
-Data preparation:
+This is a work in progress.
 
-1) Write it up baby
+The source code for data acquisition, analysis, and building this report are 
+all [available on GitHub](https://github.com/frasemcl/kensignton-market)
 
 
-# Data prep
+If you have any questions, comments, feedback, or would like to collaborate,
+don't hesitate to contact me: fraser.mclaughlin@outlook.com
 
-## fig - Analysis Area
+Some ideas about where I'd like to take this next include time series analysis 
+of select variables.... WHAT ELSE? Pull in CMHC data etc... Statistical analysis...
 
-```{r, fig.width=10,echo=FALSE}
-map_naming_cts
-```
+...
 
+Given that this is a work in progress, the result is not yet entirely mobile
+friendly, though almost everything scales down properly.
+
+
+# Data
+
+
+For a visual representation of the process of naming the cencsus tracts based
+on the neighbourhood that each census tract centroid falls in, see Appendix
+section: [Naming Census Tracts](#naming-cts)
 
 # Maps
 ## fig - Name this map
 Any aditional text
-```{r,fig.width=10, echo=FALSE}
+```{r, echo=FALSE}
 map_leaflet_perc30
 ```
 
-## fig - Name this graph
-Double click the ....TODO 
-```{r, fig.width=10, echo=FALSE}
-avg_montly_rent_plotly
-```
+
 
 ## tbl - Table to lookup all the census variables...
 Use the search bar to...
 ```{r, echo=FALSE}
-table_var_lookup_all
+table_var_lookup
 ```
 
+# Appendix
 
+## Naming Census Tracts{#naming-cts}
+
+```{r, out.width = "100%", echo=FALSE}
+
+# To check, mobile responsiveness is improved now, but to test if out.width
+# here is helping or if it was the width var in map_leaflet_perc30 only
+
+map_naming_cts
+```
+
+## Other Data Visualizations
+
+Use the 'range slider' below the main plot to focus on range of interest. This plot may be used or adapted in subsequent versions of this analysis. This output can now easily be generated for any variable.
+
+```{r, fig.height = 7, out.width = "100%", message = FALSE, echo = FALSE}
+v_CA21_4307_plotly_sorted_bar
+v_CA21_4315_plotly_sorted_bar
+```

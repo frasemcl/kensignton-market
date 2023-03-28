@@ -63,12 +63,12 @@ tor_census_df <- tor_census_df %>%
 # map the results then results and results from previous script
 # make_leaflet(tor_census_df, tor_census_df$name_concat)
 
-make_leaflet_2(df=tor_census_df, 
-               label=tor_census_df$name_concat,
-               group1='Census Tracts',
-               df2=nhood_data, 
-               label2=nhood_data$AREA_NAME,
-               group2='Neighbourhoods')
+map_compare_cts_nhs <- make_leaflet_2(df=tor_census_df, 
+                       label=tor_census_df$name_concat,
+                       group1='Census Tracts',
+                       df2=nhood_data, 
+                       label2=nhood_data$AREA_NAME,
+                       group2='Neighbourhoods')
 
 map_naming_cts <- make_leaflet_3(df=tor_census_df, 
                 label=tor_census_df$name_concat,
