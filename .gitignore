@@ -59,4 +59,4 @@ output/*
 !output/_.txt
 .DS_Store
 tests.R
-.html
+*.html
