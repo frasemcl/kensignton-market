@@ -58,8 +58,6 @@ pacman::p_load(
 
 # Introduction
 
-Created: Feb 2023
-
 This analysis investigates...
 
 This is a work in progress.
@@ -67,42 +65,47 @@ This is a work in progress.
 The source code for data acquisition, analysis, and building this report are 
 all [available on GitHub](https://github.com/frasemcl/kensignton-market)
 
-
-If you have any questions, comments, feedback, or would like to collaborate,
-don't hesitate to contact me: fraser.mclaughlin@outlook.com
-
 Some ideas about where I'd like to take this next include time series analysis 
 of select variables.... WHAT ELSE? Pull in CMHC data etc... Statistical analysis...
-
-...
-
-Given that this is a work in progress, the result is not yet entirely mobile
-friendly, though almost everything scales down properly.
 
 
 # Data
 
+Introduce data sources...
 
 For a visual representation of the process of naming the cencsus tracts based
 on the neighbourhood that each census tract centroid falls in, see Appendix
 section: [Naming Census Tracts](#naming-cts)
 
+## Census Variable Lookup
+Use the search bar to search through all 2021 census variables, also called vectors.
+```{r, warning=FALSE,echo=FALSE}
+table_var_lookup
+```
+
 # Maps
-## fig - Name this map
-Any aditional text
+## Shelter Expense
+Toggle between these two choropleth layers in the top right:
+v_CA21_4315: % of tenant households spending 30% or more of its income on shelter costs\
+v_CA21_4307: % of owner households spending 30% or more of its income on shelter costs
 ```{r, echo=FALSE}
 map_leaflet_perc30
 ```
 
+# Tables
 
 
-## tbl - Table to lookup all the census variables...
-Use the search bar to...
-```{r, echo=FALSE}
-table_var_lookup
-```
 
 # Appendix
+
+## Interactive Histogram
+This interactive plot allows users to explore the distribution of a large number (but not all)
+of census variables. To be used alongside the lookup table above.
+
+```{r, out.width = "100%", echo=FALSE}
+
+interactive_histogram
+```
 
 ## Naming Census Tracts{#naming-cts}
 
@@ -122,3 +125,23 @@ Use the 'range slider' below the main plot to focus on range of interest. This p
 v_CA21_4307_plotly_sorted_bar
 v_CA21_4315_plotly_sorted_bar
 ```
+
+## Process Notes
+This analysis was done entirely in R, leaning heavily on the Cancensus, Leaflet, 
+Tidyverse, and Plotly packages among others, many thanks to their contributors.
+
+Note that it would be easy to build a Shiny or Dash web application that allows 
+the user to display this map for any variable. However, this interactivity would
+mean hosting the report online whereas the current document can be saved locally
+and shared privately (which in other instances may be desirable).
+
+This report was developed for desktop viewing, but it is is responsive to smaller screen sizes.
+If you have accessibility concerns, please reach out and I'll make whatever improvements I can.
+
+# Contact
+
+If you have any questions, comments, feedback, or would like to collaborate,
+don't hesitate to contact me at fraser.mclaughlin@outlook.com
+
+I hope you've found this useful!\ 
+by fraser mclaughlin 2023

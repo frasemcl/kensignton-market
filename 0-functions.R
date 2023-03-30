@@ -76,26 +76,32 @@ make_leaflet_3 <- function(df,
     )
 }
 
-###
-# TODO add some details to the popup
+### THIS IS THE MAIN LEAFLET USED IN THE REPORT ################################
 make_leaflet_compare2 <- function(df,
-                                          label = df[[1]],
-                                          varDesc=names(df)[2],
-                                          df2,
-                                          label2 = df2[[1]],
-                                          varDesc2=names(df)[2],
-                                          df_nh = nhood_data,
-                                          perc_or_num='num'){
+                                  label = df[[1]],
+                                  varDesc=names(df)[2],
+                                  df2,
+                                  label2 = df2[[1]],
+                                  varDesc2=names(df)[2],
+                                  df_nh = nhood_data,
+                                  perc_or_num='num'){
   if (perc_or_num == 'num'){
     pal <- colorNumeric(palette = "YlOrRd", domain = df[[2]], n = 5, reverse = FALSE)
-  pal2 <- colorNumeric(palette = "YlOrRd", domain = df2[[2]], n = 5, reverse = FALSE)
-  }
+    pal2 <- colorNumeric(palette = "YlOrRd", domain = df2[[2]], n = 5, reverse = FALSE)
+    popup1 <- paste0("<strong>CT: </strong>",df[[1]],
+                     "<br><strong>",names(df)[2]," Value: </strong>",df[[2]])
+    popup2 <- paste0("<strong>CT: </strong>",df2[[1]],
+                     "<br><strong>",names(df2)[2]," Value: </strong>",df2[[2]])
+  } 
   if (perc_or_num == 'perc'){
-  pal <- colorQuantile(palette = "YlOrRd", domain = df[[2]], n = 5, reverse = FALSE)
-  pal2 <- colorQuantile(palette = "YlOrRd", domain = df2[[2]], n = 5, reverse = FALSE)
+    pal <- colorQuantile(palette = "YlOrRd", domain = df[[2]], n = 5, reverse = FALSE)
+    pal2 <- colorQuantile(palette = "YlOrRd", domain = df2[[2]], n = 5, reverse = FALSE)
+    popup1 <- paste0("<strong>CT: </strong>",df[[1]],
+                     "<br><strong>",names(df)[2]," Value: </strong>",df[[2]],'%')
+    popup2 <- paste0("<strong>CT: </strong>",df2[[1]],
+                     "<br><strong>",names(df2)[2]," Value: </strong>",df2[[2]],'%')
  }
 
-  
   
   # Setting width here helps with mobile html formatting (from RMD knit)
   # Makes it look worse within RStudio however
@@ -117,7 +123,8 @@ make_leaflet_compare2 <- function(df,
                 color = 'grey', 
                 weight = 0.5, 
                 smoothFactor = 0.5, 
-                popup = ~df[[1]], 
+                # popup = ~df[[1]],
+                popup = ~popup1,
                 label = ~df[[1]],
                 group = varDesc
     ) %>%
@@ -127,7 +134,7 @@ make_leaflet_compare2 <- function(df,
                 color = 'grey', 
                 weight = 0.5, 
                 smoothFactor = 0.5, 
-                popup = ~df2[[1]], 
+                popup = ~popup2, 
                 label = ~df2[[1]],
                 group = varDesc2
     ) %>% 
@@ -141,14 +148,14 @@ make_leaflet_compare2 <- function(df,
     hideGroup(varDesc2)
 }
 
-####### FUNCTION FOR INTEREACTIVE SLIDER PLOTLY ####################
+####### FUNCTION FOR INTEREACTIVE SLIDER PLOTLY in report appendix ####################
 make_plotly_sortedbar <- function(df, axisStr, varVect, varStr) {
   input_df <- df %>%
     select(name_concat, varStr)
   cols <- colnames(input_df)
   input_df$name_concat <- factor(input_df$name_concat, levels = unique(input_df$name_concat)[order(varVect)])
-  fig <- plot_ly(input_df, x = ~name_concat, y = as.numeric(unlist((input_df[,cols[2]])), type = 'bar'
-                                                            , orientation='h'
+  fig <- plot_ly(input_df, x = ~name_concat, y = as.numeric(unlist((input_df[,cols[2]])), 
+                 type = 'bar', orientation='h'
   ))
   
   # m <- list(
