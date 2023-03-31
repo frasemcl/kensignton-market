@@ -11,16 +11,6 @@ library(leaflet.extras)
 # There may be complimentary data here, or use to validate my findings:
 # https://open.canada.ca/data/en/dataset/85ca6dcc-c694-441e-afff-9ea7eeb265d8
 
-# A few census variables of interest for this analysis:
-# v_CA21_4288 Total - Owner and tenant households with household total income greater than zero, in non-farm, non-reserve private dwellings by shelter-cost-to-income ratio
-# v_CA21_4290 (households) Spending 30% or more of income on shelter costs
-# v_CA21_4302 Total - Owner and tenant households with household total income greater than zero and shelter-cost-to-income ratio less than 100%, in non-farm, non-reserve private dwellings
-# v_CA21_4307 % of owner households spending 30% or more of its income on shelter costs
-# v_CA21_4309 Median monthly shelter costs for owned dwellings ($)
-# v_CA21_4310 Average monthly shelter costs for owned dwellings ($)
-# v_CA21_4315 % of tenant households spending 30% or more of its income on shelter costs
-# v_CA21_4317 Median monthly shelter costs for rented dwellings ($)
-# v_CA21_4318 Average monthly shelter costs for rented dwellings ($)
 
 # Shorten colnames for the two dataframes from script 3. Details will be in a lookup table instead
 colnames(tor_census_df) <- c(str_split(colnames(tor_census_df), ":") %>% map_chr(`[`, 1))
@@ -39,14 +29,53 @@ tor_census_df_na_999[is.na(tor_census_df_no_geom)] <- -999
 
 
 ############# LOOKUP TABLES ####################################################
-# The first three vars used for now as an example, but in the output I'll choose carefully and define each above/below
+# TABLE General variables of interest for this analaysis:
 tor_census_df_sel <- tor_census_df_no_geom %>% 
-  select(name_concat, v_CA21_1, v_CA21_2, v_CA21_3)
-# KEEPER table, but not for these variables per se
-table_census_df_lookup1<- reactable(tor_census_df_sel, searchable = TRUE, defaultPageSize=5)
-table_census_df_lookup1
+  select(name_concat, v_CA21_1, v_CA21_3, v_CA21_386, v_CA21_560, v_CA21_906)
+# Table shown in report, for some general stats:
+# v_CA21_1 Total Population, 2021
+# v_CA21_3 Total Population percentage change, 2016 to 2021 
+# v_CA21_386 Total Average age
+# v_CA21_560 Total Median total income in 2020 among recipients ($)
+# v_CA21_906 Total Median total income of household in 2020 ($)
+table_background_info<- reactable(tor_census_df_sel, searchable = TRUE, defaultPageSize=5)
+table_background_info
+###############################################
+# TABLE amount of housing per CT
+tor_census_df_sel_2 <- tor_census_df_no_geom %>% 
+  select(name_concat, v_CA21_434, v_CA21_4288, v_CA21_4302, v_CA21_452)
+# Table shown in report:
+# v_CA21_434 Total Occupied private dwellings by structural type of dwelling data
+# v_CA21_4288 Total - Owner and tenant households with household total income greater than zero, in non-farm, non-reserve private dwellings by shelter-cost-to-income ratio
+# v_CA21_4302 Total - Owner and tenant households with household total income greater than zero and shelter-cost-to-income ratio less than 100%, in non-farm, non-reserve private dwellings
+# v_CA21_452 Total Average household size
+table_housing_amt<- reactable(tor_census_df_sel_2, searchable = TRUE, defaultPageSize=5)
+table_housing_amt
+###############################################
+# TABLE amount of high expense housing per CT
+tor_census_df_sel_3 <- tor_census_df_no_geom %>% 
+  select(name_concat, v_CA21_4290, v_CA21_4307, v_CA21_4315)
+# Table shown in report:
+# v_CA21_4290 (households) Spending 30% or more of income on shelter costs
+# v_CA21_4307 % of owner households spending 30% or more of its income on shelter costs
+# v_CA21_4315 % of tenant households spending 30% or more of its income on shelter costs
+table_expensive <- reactable(tor_census_df_sel_3, searchable = TRUE, defaultPageSize=5)
+table_expensive
+###############################################
+# TABLE cost of housing per CT
+tor_census_df_sel_4 <- tor_census_df_no_geom %>% 
+  select(name_concat, v_CA21_4309, v_CA21_4310, v_CA21_4317, v_CA21_4318)
+# Table shown in report:
+# v_CA21_4309 Median monthly shelter costs for owned dwellings ($)
+# v_CA21_4310 Average monthly shelter costs for owned dwellings ($)
+# v_CA21_4317 Median monthly shelter costs for rented dwellings ($)
+# v_CA21_4318 Average monthly shelter costs for rented dwellings ($)
+table_costs <- reactable(tor_census_df_sel_4, searchable = TRUE, defaultPageSize=5)
+table_costs
 
-# Lookup table for the variables (cancensus vectors)
+
+# Lookup table for the variables (cancensus vectors) ###########################
+# View(variables21)
 table_var_lookup_all <- reactable(variables21, searchable = TRUE, defaultPageSize=5)
 table_var_lookup_all
 vars21 <- variables21 %>% 
