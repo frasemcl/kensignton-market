@@ -58,26 +58,30 @@ pacman::p_load(
 
 # Introduction
 
-This analysis investigates...
+This analysis investigates the spatial distribution of housing affordability in 
+Toronto using 2021 census data. This is a work in progress personal interest 
+project stemming from the housing crisis we face in the city that I'm from.
 
-This is a work in progress.
+The source code for data acquisition, analysis, and this report are 
+all [available on GitHub](https://github.com/frasemcl/kensignton-market).
 
-The following analysis is a personal interest project stemming from the housing
-crisis that we face in Toronto, and an opportunity to demonstrate some of my R
-techniques to potential collaborators.
+This began as a simple data pull for the 
+[Kensington Market Community Land Trust](https://kmclt.ca/), an organization
+doing important work, and turned into a deeper dive into the results from our 
+most recent census from a Toronto housing affordability perspective.
 
-The source code for data acquisition, analysis, and building this report are 
-all [available on GitHub](https://github.com/frasemcl/kensignton-market)
-
-Some ideas about where I'd like to take this next include time series analysis 
-of select variables.... WHAT ELSE? Pull in CMHC data etc... Statistical analysis...
-
-Census tracts (CTs)
+If I find more time to put into this analysis, there are many more variables that
+could be investigated at the Census Tract (CT) level, but I'd really like to look
+at changes in the variables shown here over time, understanding that this can be 
+tricky given that both census questions and census boundaries change over time. 
 
 
 # Data
 
-Introduce data sources...
+The data for this project are from 
+
+Census tracts (CTs)
+
 
 For a visual representation of the process of naming the cencsus tracts based
 on the neighbourhood that each census tract centroid falls in, see Appendix
@@ -100,10 +104,10 @@ Sort any variable by clicking on the variable name, or try the search bar
 table_background_info
 ```
 
-## Shelter Expense
+## Expensive Housing
 ### Map
-v_CA21_4315: % of tenant households spending 30% or more of its income on shelter costs\
-v_CA21_4307: % of owner households spending 30% or more of its income on shelter costs\
+**v_CA21_4315:** % of tenant households spending 30% or more of its income on shelter costs\
+**v_CA21_4307:** % of owner households spending 30% or more of its income on shelter costs\
 
 **Hover or click CTs, zoom, and toggle between these two choropleth layers in the top right**
 ```{r, echo=FALSE}
@@ -111,9 +115,9 @@ map_leaflet_perc30
 ```
 
 ### Table
-v_CA21_4290: (households) Spending 30% or more of income on shelter costs\
-v_CA21_4307: % of owner households spending 30% or more of its income on shelter costs\
-v_CA21_4315: % of tenant households spending 30% or more of its income on shelter costs\
+**v_CA21_4290:** (households) Spending 30% or more of income on shelter costs\
+**v_CA21_4307:** % of owner households spending 30% or more of its income on shelter costs\
+**v_CA21_4315:** % of tenant households spending 30% or more of its income on shelter costs\
 
 **Sort any variable by clicking on the variable name, or try the search bar**
 ```{r, warning=FALSE,echo=FALSE}
@@ -122,22 +126,21 @@ table_expensive
 
 ## Amount of Housing
 ### Map
-v_CA21_434: Total Occupied private dwellings by structural type of dwelling data\
-v_CA21_452: Total Average household size\
+**v_CA21_434:** Total Occupied private dwellings by structural type of dwelling data\
+**v_CA21_452:** Total Average household size\
 
 **Hover or click CTs, zoom, and toggle between these two choropleth layers in the top right**
 ```{r, echo=FALSE}
-print('to make')
-
+map_leaflet_house_amnt
 ```
 
 ### Table
 The first three variables are all very similar, I included them all to help understand what they each represent.
 
-v_CA21_434: Total Occupied private dwellings by structural type of dwelling data\
-v_CA21_4288: Total - Owner and tenant households with household total income greater than zero, in non-farm, non-reserve private dwellings by shelter-cost-to-income ratio\
-v_CA21_4302: Total - Owner and tenant households with household total income greater than zero and shelter-cost-to-income ratio less than 100%, in non-farm, non-reserve private dwellings\
-v_CA21_452: Total Average household size\
+**v_CA21_434:** Total Occupied private dwellings by structural type of dwelling data\
+**v_CA21_4288:** Total - Owner and tenant households with household total income greater than zero, in non-farm, non-reserve private dwellings by shelter-cost-to-income ratio\
+**v_CA21_4302:** Total - Owner and tenant households with household total income greater than zero and shelter-cost-to-income ratio less than 100%, in non-farm, non-reserve private dwellings\
+**v_CA21_452:** Total Average household size\
 
 **Sort any variable by clicking on the variable name, or try the search bar**
 ```{r, warning=FALSE,echo=FALSE}
@@ -146,20 +149,19 @@ table_housing_amt
 
 ## Housing Cost
 ### Map
-v_CA21_4309: Median monthly shelter costs for owned dwellings (\$)\
-v_CA21_4317: Median monthly shelter costs for rented dwellings (\$)\
-
+**v_CA21_4309:** Median monthly shelter costs for owned dwellings (\$)\
+**v_CA21_4317:** Median monthly shelter costs for rented dwellings (\$)\
 
 **Hover or click CTs, zoom, and toggle between these two choropleth layers in the top right**
 ```{r, echo=FALSE}
-print('to make')
+map_leaflet_med_cost
 ```
 
 ### Table
-v_CA21_4309: Median monthly shelter costs for owned dwellings (\$)\
-v_CA21_4310: Average monthly shelter costs for owned dwellings (\$)\
-v_CA21_4317: Median monthly shelter costs for rented dwellings (\$)\
-v_CA21_4318: Average monthly shelter costs for rented dwellings (\$)\
+**v_CA21_4309:** Median monthly shelter costs for owned dwellings (\$)\
+**v_CA21_4310:** Average monthly shelter costs for owned dwellings (\$)\
+**v_CA21_4317:** Median monthly shelter costs for rented dwellings (\$)\
+**v_CA21_4318:** Average monthly shelter costs for rented dwellings (\$)\
 
 **Sort any variable by clicking on the variable name, or try the search bar**
 ```{r, warning=FALSE,echo=FALSE}
@@ -214,10 +216,17 @@ This analysis was done entirely in R, leaning heavily on the Cancensus, Leaflet,
 Tidyverse, and Plotly packages among others, many thanks to all the talented 
 open source developers who build and maintain these amazing tools!
 
+This report is written in R markdown and then knit to HTML. The benefit of this
+
+
 Note that it would be easy to build a Shiny or Dash web application that allows 
 the user to display this map for any variable. However, this interactivity would
 mean hosting the report online whereas the current document can be saved locally
-and shared privately (which in other instances may be desirable).
+and shared privately (which in other instances may be desirable). format is that 
+although it opens in the browser and has interactivity baked in,
+it is also easy to share directly and view offline only. The downside to this
+format however is a very large file size compared to a reactive solution using
+a server. 
 
 This report was developed for desktop viewing, but it is responsive and looks
 good on smaller screens as well.
@@ -226,8 +235,9 @@ If you have accessibility concerns, please reach out and I'll make whatever impr
 
 # Contact
 
-If you have any questions, comments, feedback, or would like to collaborate,
-don't hesitate to contact me at fraser.mclaughlin@outlook.com
+If you have any questions, comments, or feedback, I'm at fraser.mclaughlin@outlook.com.
+I specialize in data analysis, visualization and decision making tools. Reach out 
+if you'd like to collaborate!
 
-I hope you've found this useful!\
+I hope you've found this useful.\
 &copy; Fraser McLaughlin 2023\

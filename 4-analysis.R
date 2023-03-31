@@ -52,7 +52,7 @@ tor_census_df_sel_2 <- tor_census_df_no_geom %>%
 table_housing_amt<- reactable(tor_census_df_sel_2, searchable = TRUE, defaultPageSize=5)
 table_housing_amt
 ###############################################
-# TABLE amount of high expense housing per CT
+# TABLE amount of expensive housing per CT
 tor_census_df_sel_3 <- tor_census_df_no_geom %>% 
   select(name_concat, v_CA21_4290, v_CA21_4307, v_CA21_4315)
 # Table shown in report:
@@ -88,27 +88,59 @@ table_var_lookup
 
 ##### LEAFLET CHOROPLETH ##################################################
 
-#Filter the df by the var of interest. Function takes two dataframes
-# vars of interst to be filtered selected like this first
-df <- tor_census_df %>% 
+#Filter the df by the vars of interest. Function takes two dataframes
+# vars of interest selected like this first
+df_perc30 <- tor_census_df %>% 
   select(name_concat, v_CA21_4307) %>% 
   drop_na()
-df2 <- tor_census_df %>% 
+df2_perc30 <- tor_census_df %>% 
   select(name_concat, v_CA21_4315) %>% 
   drop_na()
-
-####### Calling function from script0 ###### KEEPER #######
-map_leaflet_perc30 <- make_leaflet_compare2(df=df,
-                      varDesc='v_CA21_4307: % of owner households spending 30% or more of its income on shelter costs',
-                      df2=df2,
-                      varDesc2 = 'v_CA21_4315: % of tenant households spending 30% or more of its income on shelter costs',
-                      perc_or_num = 'perc')
+####### Calling function from script0
+map_leaflet_perc30 <- make_leaflet_compare2(df2=df_perc30,
+                      varDesc2='v_CA21_4307: % of owner households spending 30% or more of its income on shelter costs',
+                      df=df2_perc30,
+                      varDesc = 'v_CA21_4315: % of tenant households spending 30% or more of its income on shelter costs',
+                      perc_or_num_or_cur = 'perc')
 
 map_leaflet_perc30
 
-########################################################################
+######################################################
+#Filter the df by the vars of interest. Function takes two dataframes
+# vars of interest selected first
+df_med_cost <- tor_census_df %>% 
+  select(name_concat, v_CA21_4309) %>%
+  drop_na()
+df2_med_cost2 <- tor_census_df %>% 
+  select(name_concat, v_CA21_4317) %>% 
+  drop_na()
+####### Calling function from script0
+map_leaflet_med_cost <- make_leaflet_compare2(df2=df_med_cost,
+                                            varDesc2='v_CA21_4309: Median monthly shelter costs for owned dwellings ($)',
+                                            df=df2_med_cost2,
+                                            varDesc = 'v_CA21_4317: Median monthly shelter costs for rented dwellings ($)',
+                                            perc_or_num_or_cur = 'cur')
 
+map_leaflet_med_cost
+######################################################
+#Filter the df by the vars of interest. Function takes two dataframes
+# vars of interest selected first
+df_house_amnt <- tor_census_df %>% 
+  select(name_concat, v_CA21_434) %>%
+  drop_na()
+df2_house_amnt2 <- tor_census_df %>% 
+  select(name_concat, v_CA21_452) %>% 
+  drop_na()
+####### Calling function from script0
+map_leaflet_house_amnt <- make_leaflet_compare2(df=df_house_amnt,
+                                              varDesc='v_CA21_434: Total Occupied private dwellings by structural type of dwelling data',
+                                              df2=df2_house_amnt2,
+                                              varDesc2 = 'v_CA21_452: Average household size',
+                                              perc_or_num_or_cur = 'num')
 
+map_leaflet_house_amnt
+
+######################################################
 
 
 # IN REPORT APPENDIX
