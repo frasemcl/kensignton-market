@@ -43,7 +43,7 @@ table_background_info
 ###############################################
 # TABLE amount of housing per CT
 tor_census_df_sel_2 <- tor_census_df_no_geom %>% 
-  select(name_concat, v_CA21_434, v_CA21_4288, v_CA21_4302, v_CA21_452)
+  select(name_concat, v_CA21_434, v_CA21_452)
 # Table shown in report:
 # v_CA21_434 Total Occupied private dwellings by structural type of dwelling data
 # v_CA21_4288 Total - Owner and tenant households with household total income greater than zero, in non-farm, non-reserve private dwellings by shelter-cost-to-income ratio

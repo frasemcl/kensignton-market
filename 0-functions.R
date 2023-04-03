@@ -86,6 +86,7 @@ make_leaflet_compare2 <- function(df,
                                   df_nh = nhood_data,
                                   perc_or_num_or_cur='num'){
   # TODO refactor this repetition
+
   if (perc_or_num_or_cur == 'num'){
     pal <- colorNumeric(palette = "YlOrRd", domain = df[[2]], n = 5, reverse = FALSE)
     pal2 <- colorNumeric(palette = "YlOrRd", domain = df2[[2]], n = 5, reverse = FALSE)
@@ -94,9 +95,10 @@ make_leaflet_compare2 <- function(df,
     popup2 <- paste0("<strong>CT: </strong>",df2[[1]],
                      "<br><strong>",names(df2)[2]," value: </strong>",df2[[2]])
   } 
+  # TODO, get this one working with colorQuantile (was having issue with the legend)
   if (perc_or_num_or_cur == 'perc'){
-    pal <- colorQuantile(palette = "YlOrRd", domain = df[[2]], n = 5, reverse = FALSE)
-    pal2 <- colorQuantile(palette = "YlOrRd", domain = df2[[2]], n = 5, reverse = FALSE)
+    pal <- colorNumeric(palette = "YlOrRd", domain = df[[2]], n = 5, reverse = FALSE)
+    pal2 <- colorNumeric(palette = "YlOrRd", domain = df2[[2]], n = 5, reverse = FALSE)
     popup1 <- paste0("<strong>CT: </strong>",df[[1]],
                      "<br><strong>",names(df)[2]," value: </strong>",df[[2]],'%')
     popup2 <- paste0("<strong>CT: </strong>",df2[[1]],

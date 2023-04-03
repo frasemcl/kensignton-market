@@ -55,7 +55,7 @@ pacman::p_load(
 # Introduction
 
 This report provides information on the spatial distribution of housing affordability in 
-Toronto based 2021 Census data. This is a personal interest 
+Toronto based on 2021 Census data. This is a personal interest 
 project and a work in progress.
 
 The source code for data acquisition, visualization, and creating this report are 
@@ -82,23 +82,17 @@ Each CT name (which is actaully a number) has been joined to
 the Toronto neighbourhood that it is located in. The process of naming the CTs based
 on the neighbourhood is outlined in [the appendix](#naming-cts).
 
-## Census Variable Lookup
-This table allows you to search through all 2021 Census variables by name,
-keyword or by 'vector', which is a naming convention from the [cancensus CensusMapper API](https://mountainmath.github.io/cancensus/articles/data_discovery.html) not 
-from StatsCan. 
-
-Search by vector code for full details of any variable shown below, or use this
-interactive table to explore the full range of census variables.
-
-**Try the search bar**
-```{r, warning=FALSE,echo=FALSE}
-table_var_lookup
-```
+For example, the CT that delineates Kensignton Market is called '0038.00' and in 
+this analysis it has been renamed **'0038.00_Kensington-Chinatown'**. To evaluate 
+Kensington-Chinatown neighbourhood as a whole, you would need to consider multiple CTs:
+'0036.00_Kensington-Chinatown', '0037.00_Kensington-Chinatown', '0038.00_Kensington-Chinatown',
+'0039.00_Kensington-Chinatown'
 
 # Visualization
 ## General Info
 This table contains some basic demographic information and income information for
-all Toronto Census Tracts. 
+all 585 Toronto Census Tracts. For more full details on each census variable,
+consult [this lookup table in the appendix](#var-lookup).
 
 ### Table
 **v_CA21_1:** Population, 2021\
@@ -123,7 +117,7 @@ Census variables describing expensive housing across the city.
 **v_CA21_4315:** % of tenant households spending 30% or more of its income on shelter costs\
 **v_CA21_4307:** % of owner households spending 30% or more of its income on shelter costs\
 
-**Hover or click CTs for more info, zoom in/out, and toggle between the two choropleth layers (top right)**
+**Hover, click CT for more info, zoom in/out, and toggle between the two choropleth layers (top right)**
 ```{r, echo=FALSE}
 map_leaflet_perc30
 ```
@@ -138,26 +132,23 @@ map_leaflet_perc30
 table_expensive
 ```
 
-## Amount of Housing
+## Housing Density
 The following map and table can be used to explore the amount of housing in each
 Census Tract.
 
 ### Map
-**v_CA21_434:** Total Occupied private dwellings by structural type of dwelling data\
+**v_CA21_434:** Total Occupied dwellings\
 **v_CA21_452:** Total Average household size\
 
-**Hover or click CTs for more info, zoom in/out, and toggle between the two choropleth layers (top right)**
+**Hover, click CT for more info, zoom in/out, and toggle between the two choropleth layers (top right)**
 ```{r, echo=FALSE}
 map_leaflet_house_amnt
 ```
 
 ### Table
-The first three variables are all very similar. Use the lookup table at the top
-to compare them.
+For more full details on each census variable consult [the lookup table in the appendix](#var-lookup).
 
-**v_CA21_434:** Total Occupied private dwellings by structural type of dwelling data\
-**v_CA21_4288:** Total - Owner and tenant households with household total income greater than zero, in non-farm, non-reserve private dwellings by shelter-cost-to-income ratio\
-**v_CA21_4302:** Total - Owner and tenant households with household total income greater than zero and shelter-cost-to-income ratio less than 100%, in non-farm, non-reserve private dwellings\
+**v_CA21_434:** Total Occupied dwellings\
 **v_CA21_452:** Total Average household size\
 
 **To sort by a variable, click on the variable name**
@@ -173,7 +164,7 @@ The following map and table contain data on housing cost by CT.
 **v_CA21_4309:** Median monthly shelter costs for owned dwellings (\$)\
 **v_CA21_4317:** Median monthly shelter costs for rented dwellings (\$)\
 
-**Hover or click CTs for more info, zoom in/out, and toggle between the two choropleth layers (top right)**
+**Hover, click CT for more info, zoom in/out, and toggle between the two choropleth layers (top right)**
 ```{r, echo=FALSE}
 map_leaflet_med_cost
 ```
@@ -190,7 +181,20 @@ table_costs
 ```
 
 # Appendix
-The following visualizations were useful to explore the data but haven't been finalized.
+The following tables and figures support the visualizations above.
+
+## Census Variable Lookup{#var-lookup}
+This table allows you to search through all 2021 Census variables by name,
+keyword or by 'vector', which is a naming convention from the [cancensus CensusMapper API](https://mountainmath.github.io/cancensus/articles/data_discovery.html) not 
+from StatsCan. 
+
+Search by vector code for full details of any variable shown below, or use this
+interactive table to explore the full range of census variables.
+
+**Try the search bar**
+```{r, warning=FALSE,echo=FALSE}
+table_var_lookup
+```
 
 ## Interactive Histogram
 This interactive plot allows users to explore the distribution of a large number (but not all)
@@ -226,12 +230,11 @@ map_naming_cts
 
 ## Other Data Visualizations
 
-Use the 'range slider' below the main plot to focus on range of interest.
-
 Comparing these two plots is interesting because it is clear, based on the number of
 CTs at or above the 40% line for example, that despite the high cost of home ownership, 
 many more renters face high housing cost pressures.
 
+**Use the 'range slider' below the main plot to focus on range of interest.**
 ```{r, fig.height = 7, out.width = "100%", message = FALSE, echo = FALSE}
 v_CA21_4307_plotly_sorted_bar
 v_CA21_4315_plotly_sorted_bar
