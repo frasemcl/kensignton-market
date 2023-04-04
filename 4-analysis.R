@@ -216,7 +216,8 @@ make_plotly_sortedbar_filter <- function(df, axisStr, varVect, varStr) {
                         yaxis = list(title = '')
   )
 }
-########## USING Plotly bar chart with filterable traces ####################
+########## Plotly bar chart with filterable traces ####################
+# Not currenly in report 
 # Graph 1 of this type
 avg_montly_rent_plotly <- make_plotly_sortedbar_filter(
   df = tor_census_df_no_geom,
@@ -224,7 +225,6 @@ avg_montly_rent_plotly <- make_plotly_sortedbar_filter(
   varVect = tor_census_df_no_geom$v_CA21_4317,
   varStr = 'v_CA21_4317'
 )
-avg_montly_rent_plotly
 # Graph 2
 v_CA21_4290_plotly <- make_plotly_sortedbar_filter(
   df = tor_census_df_no_geom,

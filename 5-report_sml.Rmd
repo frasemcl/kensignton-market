@@ -1,0 +1,246 @@
+---
+title: "Housing Affordability in Toronto"
+subtitle: "Visualizing 2021 Census Data"
+author: "Fraser McLaughlin"
+contact: 'fraser.mclaughlin@outlook.com'
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_notebook:
+    toc: yes
+    df_print: paged
+    toc_float: yes
+    number_sections: yes
+    code_folding: hide
+    
+---
+```{css, echo=FALSE}
+
+p.caption {
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+.customTable {
+  width: 100%;
+  border: 1px solid black;
+  border-collapse: collapse;
+  
+.customTable th,
+.customTable td {
+  width: 20%;
+  text-align: left;
+  padding: 4px;
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+}
+```
+
+```{r setup, warning=FALSE, echo=FALSE}
+library("pacman")
+pacman::p_load(
+  tidyverse,
+  scales,
+  leaflet,
+  plotly,
+  reactable,
+  htmltools,
+  htmlwidgets,
+  leaflet.extras
+)
+
+```
+
+
+# Introduction
+
+This report provides information on the spatial distribution of housing affordability in 
+Toronto based on 2021 Census data. This is a personal interest 
+project and a work in progress.
+
+The source code for data acquisition, visualization, and creating this report are 
+all [available on GitHub](https://github.com/frasemcl/kensignton-market).
+
+This began as a data pull for the 
+[Kensington Market Community Land Trust](https://kmclt.ca/), an organization
+I recommend checking out, and turned into a deeper dive into the results from the 
+most recent Census from a Toronto housing affordability perspective.
+
+When I find time to take this further, there are many more 2021 variables 
+that I'd like to investigate, but my top priority is to demonstrate how the variables
+shown below have changed over time.
+
+
+# Data
+
+- 2021 Census results and Census Tract (CT) boundaries are from the 
+[cancensus R package](https://mountainmath.github.io/cancensus/).
+
+- Toronto neighbourhood boundaries are from the [opendatatoronto R package](https://cran.r-project.org/web/packages/opendatatoronto/index.html)
+
+Each CT name (which is actaully a number) has been joined to 
+the Toronto neighbourhood that it is located in. The process of naming the CTs based
+on the neighbourhood is outlined in [the appendix](#naming-cts).
+
+For example, the CT that delineates Kensignton Market is called '0038.00' and in 
+this analysis it has been renamed **'0038.00_Kensington-Chinatown'**. To evaluate 
+Kensington-Chinatown neighbourhood as a whole, you would need to consider multiple CTs:
+'0036.00_Kensington-Chinatown', '0037.00_Kensington-Chinatown', '0038.00_Kensington-Chinatown',
+'0039.00_Kensington-Chinatown'
+
+# Visualization
+## General Info
+This table contains some basic demographic information and income information for
+all 585 Toronto Census Tracts. For more full details on each census variable,
+consult [this lookup table in the appendix](#var-lookup).
+
+### Table
+**v_CA21_1:** Population, 2021\
+**v_CA21_3:** Population percentage change, 2016 to 2021\
+**v_CA21_386:** Average age\
+**v_CA21_560:** Median total income in 2020 among recipients (\$)\
+**v_CA21_906:** Median total income of household in 2020 (\$)\
+
+**To sort by a variable, click on the variable name**\
+**Search by CT or neighbourhood name for details by CT**
+```{r, warning=FALSE,echo=FALSE}
+table_background_info
+```
+
+## Expensive Housing
+Households spending more than 30% of total houshold income on shelter costs,
+be it rent, a mortgage, or repairs, are considered to be facing expensive 
+housing costs. The following map and table provide interactive means to explore 
+Census variables describing expensive housing across the city.
+
+### Map
+**v_CA21_4315:** % of tenant households spending 30% or more of its income on shelter costs\
+**v_CA21_4307:** % of owner households spending 30% or more of its income on shelter costs\
+
+**Hover, click CT for more info, zoom in/out, and toggle between the two choropleth layers (top right)**
+```{r, echo=FALSE}
+map_leaflet_perc30
+```
+
+### Table
+**v_CA21_4290:** (households) Spending 30% or more of income on shelter costs\
+**v_CA21_4307:** % of owner households spending 30% or more of its income on shelter costs\
+**v_CA21_4315:** % of tenant households spending 30% or more of its income on shelter costs\
+
+**To sort by a variable, click on the variable name**
+```{r, warning=FALSE,echo=FALSE}
+table_expensive
+```
+
+## Housing Density
+The following map and table can be used to explore the amount of housing in each
+Census Tract.
+
+### Map
+**v_CA21_434:** Total Occupied dwellings\
+**v_CA21_452:** Total Average household size\
+
+**Hover, click CT for more info, zoom in/out, and toggle between the two choropleth layers (top right)**
+```{r, echo=FALSE}
+map_leaflet_house_amnt
+```
+
+### Table
+For more full details on each census variable consult [the lookup table in the appendix](#var-lookup).
+
+**v_CA21_434:** Total Occupied dwellings\
+**v_CA21_452:** Total Average household size\
+
+**To sort by a variable, click on the variable name**
+```{r, warning=FALSE,echo=FALSE}
+table_housing_amt
+```
+
+## Housing Cost
+The following map and table contain data on housing cost by CT.
+
+### Map
+
+**v_CA21_4309:** Median monthly shelter costs for owned dwellings (\$)\
+**v_CA21_4317:** Median monthly shelter costs for rented dwellings (\$)\
+
+**Hover, click CT for more info, zoom in/out, and toggle between the two choropleth layers (top right)**
+```{r, echo=FALSE}
+map_leaflet_med_cost
+```
+
+### Table
+**v_CA21_4309:** Median monthly shelter costs for owned dwellings (\$)\
+**v_CA21_4310:** Average monthly shelter costs for owned dwellings (\$)\
+**v_CA21_4317:** Median monthly shelter costs for rented dwellings (\$)\
+**v_CA21_4318:** Average monthly shelter costs for rented dwellings (\$)\
+
+**To sort by a variable, click on the variable name**
+```{r, warning=FALSE,echo=FALSE}
+table_costs
+```
+
+# Appendix
+The following tables and figures support the visualizations above.
+
+## Census Variable Lookup{#var-lookup}
+This table allows you to search through all 2021 Census variables by name,
+keyword or by 'vector', which is a naming convention from the [cancensus CensusMapper API](https://mountainmath.github.io/cancensus/articles/data_discovery.html) not 
+from StatsCan. 
+
+Search by vector code for full details of any variable shown below, or use this
+interactive table to explore the full range of census variables.
+
+**Try the search bar**
+```{r, warning=FALSE,echo=FALSE}
+table_var_lookup
+```
+
+## Naming Census Tracts{#naming-cts}
+
+When I began looking at Census data on StatsCan's sites and then using Cancensus,
+a major pain point was that the Census Tracts are named by numbers. It is common
+for Census data to be aggregated and presented at a smaller scale such as 
+by neighbourhood, smaller scale meaning larger geographic units of analysis (which is confusing I know!),
+but in the context of Toronto's heterogeneity, I wanted to keep 
+the fine grained detail of the CTs but provide CTs with meaningful names.
+
+To do this, I calculated the centroid (blue dots below) of each CT polygon, then
+determined in which neighbourhood each CT fell based on these centroids. 
+The neighbourhood name of each CT was then concatenated to the CT number name. 
+The CTs with their new names are shown on this interactive map, as are the layers 
+used to name them. The logic for using centroids came from the [Ontario Community Health Profiles Partnership](https://www.ontariohealthprofiles.ca/resourcesON.php#convfiles), thank you!
+
+```{r, out.width = "100%", echo=FALSE}
+
+# To check, mobile responsiveness is improved now, but to test if out.width
+# here is helping or if it was the width var in map_leaflet_perc30 only
+
+map_naming_cts
+```
+
+
+## Process Notes
+This analysis was done entirely in R, leaning heavily on the Cancensus, Leaflet, 
+Tidyverse, and Plotly packages among others. Many thanks to all the talented 
+open source developers who build and maintain these amazing tools!
+
+Note that it would be easy to build a Shiny or Dash web application that allows 
+the user to interactivley update any of these visualizations with any variable,
+however, the benefit of this style of document is that it opens on any personal
+computer without getting a server involved, or can be hosted online. The downside 
+to this format however is a very large file size compared to a reactive solution using a server. 
+
+This report was developed for desktop viewing, but it is responsive and looks
+good on your smaller screens too.
+
+If you have accessibility concerns, please reach out and I'll make whatever improvements I can.
+
+# Contact
+
+If you have any questions, comments, or feedback, I'm at fraser.mclaughlin@outlook.com.
+I specialize in data analysis, visualization and building decision making tools. Reach out 
+if you'd like to collaborate!
+
+I hope you've found this useful.\
+&copy; Fraser McLaughlin 2023\

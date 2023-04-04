@@ -6,11 +6,15 @@
 
 #If using leaflet anywhere in the RMD, be sure to re-build those maps when starting a new session before rendering the HTML file
 #To do this, run any script that makes leaflets:
-# source("3-name-CTS.R", echo = TRUE)
+source("3-name-CTS.R", echo = TRUE)
+source("4-analysis.R", echo = TRUE)
+
 
 
 #Run this command to render the html from the Rmd file.
 rmarkdown::render("5-report.Rmd")
+rmarkdown::render("5-report_sml.Rmd")
+
 
 
 
